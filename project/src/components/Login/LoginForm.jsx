@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { supabase } from '../../utils/supabaseClient';
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../AuthContext";
 import backgroundImage from "../../assets/new york.jpeg";
 
 const LoginForm = () => {
@@ -9,59 +10,23 @@ const LoginForm = () => {
   const [lastname, setLastname] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [role, setRole] = useState("user"); // New state for role
   const [error, setError] = useState(null);
+  const { login } = useAuth();
+  const navigate = useNavigate();
 
-  const handleAuth = async (e) => {
+  const handleAuth = (e) => {
     e.preventDefault();
     setError(null);
 
     if (isSignUp) {
       // Handle sign-up logic
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-      });
-
-      if (error) {
-        setError(error.message);
-      } else {
-        // Insert additional user data into the accounts table
-        const user = data.user;
-        const { error: insertError } = await supabase
-          .from('accounts')
-          .insert([
-            {
-              id_acc: user.id,
-              username,
-              firstname,
-              lastname,
-              email,
-              role: 'user', // default role
-              created_at: new Date(),
-              updated_at: new Date(),
-            },
-          ]);
-
-        if (insertError) {
-          setError(insertError.message);
-        } else {
-          // Handle successful sign-up
-          console.log("Signed up successfully:", data);
-        }
-      }
+      console.log("Signed up successfully:", { username, firstname, lastname, email, password, role });
     } else {
       // Handle login logic
-      const { error } = await supabase.auth.signIn({
-        email,
-        password,
-      });
-
-      if (error) {
-        setError(error.message);
-      } else {
-        // Handle successful login
-        console.log("Logged in successfully");
-      }
+      console.log("Logged in successfully:", { email, password });
+      login({ username });
+      navigate("/");
     }
   };
 
@@ -118,6 +83,21 @@ const LoginForm = () => {
                   className="w-full p-2 border rounded bg-gray-200 focus:outline-none"
                   required
                 />
+              </div>
+              <div>
+                <label className="block mb-1" htmlFor="role">
+                  Role
+                </label>
+                <select
+                  id="role"
+                  value={role}
+                  onChange={(e) => setRole(e.target.value)}
+                  className="w-full p-2 border rounded bg-gray-200 focus:outline-none"
+                  required
+                >
+                  <option value="user">User</option>
+                  <option value="admin">Admin</option>
+                </select>
               </div>
             </>
           )}
