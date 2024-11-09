@@ -4,9 +4,8 @@ import axios from 'axios';
 import { createClient } from '@supabase/supabase-js';
 
 // Initialize Supabase client
-const supabaseUrl = 'https://qmkrwxdfrfkfahqhykdc.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFta3J3eGRmcmZrZmFocWh5a2RjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mjk2NzgwNTEsImV4cCI6MjA0NTI1NDA1MX0.v02NsUrUMCXNgsjb69TULllgk0ymY4yxsNOFqTjAdf4';
-const supabase = createClient(supabaseUrl, supabaseKey);
+const supabaseUrl = 'https://fxnbmnduxydjsfkzsqtl.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ4bmJtbmR1eHlkanNma3pzcXRsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzExMjgzMTksImV4cCI6MjA0NjcwNDMxOX0.uPFnntpdKnJXo-nO6KSFtm94A7TTC8HRmkivjvZCqg8'
 
 function BookingPage() {
   const [selectedPackage, setSelectedPackage] = useState("");
