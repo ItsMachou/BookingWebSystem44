@@ -10,6 +10,7 @@ import BlogsDetails from './pages/BlogsDetails';
 import Login from './components/Login/LoginForm';
 import RegisterForm from './components/Register/RegisterForm';
 import BookingPage from './components/Booking/BookingPage';
+import AdminPage from './pages/AdminPage';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 import { AuthProvider } from './utils/AuthContext'; // Import the AuthProvider
@@ -39,6 +40,7 @@ const App = () => {
             <Route path="register" element={<RegisterForm />} />
             <Route path="*" element={<NoPage />} />
             <Route path="/Booking" element={<BookingPage />} />
+            <Route path="admin" element={<AdminPage />} />
           </Route>
         </Routes>
       </BrowserRouter>

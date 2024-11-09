@@ -11,7 +11,7 @@ const RegisterForm = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [contactNo, setContactNo] = useState(""); // Add contact number state
-  const [role, setRole] = useState("user");
+  const [role] = useState("user"); // Set role to "user" by default
   const [error, setError] = useState(null);
   const [notification, setNotification] = useState(null);
   const [showModal, setShowModal] = useState(false); // State to control modal visibility
@@ -141,18 +141,6 @@ const RegisterForm = () => {
               className="w-full p-2 border border-gray-300 rounded mt-1"
               required
             />
-          </div>
-          <div className="mb-4">
-            <label className="block text-gray-700">Role</label>
-            <select
-              value={role}
-              onChange={(e) => setRole(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded mt-1"
-              required
-            >
-              <option value="user">User</option>
-              <option value="admin">Admin</option>
-            </select>
           </div>
           <div className="mb-4">
             <label className="block text-gray-700">Email</label>
