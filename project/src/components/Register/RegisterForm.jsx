@@ -1,4 +1,3 @@
-// FILE: src/components/Register/RegisterForm.jsx
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../../utils/supabaseClient";
@@ -11,6 +10,7 @@ const RegisterForm = () => {
   const [lastname, setLastname] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [contactNo, setContactNo] = useState(""); // Add contact number state
   const [role, setRole] = useState("user");
   const [error, setError] = useState(null);
   const [notification, setNotification] = useState(null);
@@ -35,6 +35,14 @@ const RegisterForm = () => {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
+      options: {
+        data: {
+          username,
+          firstname,
+          lastname,
+          role,
+        },
+      },
     });
 
     if (error) {
@@ -50,24 +58,28 @@ const RegisterForm = () => {
 
     console.log("Signed up successfully:", data.user);
 
-    // Insert user information into the accounts table
-    const { error: insertError } = await supabase
-      .from('accounts')
-      .insert([
-        {
-          id_acc: data.user.id, // Use the user ID from Supabase auth
-          lastname,
-          firstname,
-          username,
-          email, // Optionally store email if needed
-          role,
-          // Do not include password or email_confirmed_at
-        }
-      ]);
+    // Hard-coded SQL insert statement with user ID
+    const sqlInsert = `
+      INSERT INTO accounts (id_acc, lastname, firstname, username, email, contact_no, role)
+      VALUES (
+        '${data.user.id}',  -- Use the authenticated user's ID
+        '${lastname}', 
+        '${firstname}', 
+        '${username}', 
+        '${email}', 
+        '${contactNo}', 
+        '${role}'
+      );
+    `;
+
+    // Call the execute_sql stored procedure to run the hard-coded SQL insert
+    const { error: insertError } = await supabase.rpc('execute_sql', {
+      p_sql: sqlInsert
+    });
 
     if (insertError) {
       console.error("Error inserting into accounts table:", insertError);
-      setError(insertError.message);
+      setError(insertError.message || "An error occurred while inserting data.");
     } else {
       console.log("Inserted into accounts table successfully");
       setShowModal(true); // Show the modal
@@ -116,6 +128,16 @@ const RegisterForm = () => {
               type="text"
               value={lastname}
               onChange={(e) => setLastname(e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded mt-1"
+              required
+            />
+          </div>
+          <div className="mb-4">
+            <label className="block text-gray-700">Contact Number</label>
+            <input
+              type="text"
+              value={contactNo}
+              onChange={(e) => setContactNo(e.target.value)}
               className="w-full p-2 border border-gray-300 rounded mt-1"
               required
             />
