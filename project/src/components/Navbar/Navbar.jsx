@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Logo from "../../assets/logo22.png";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom"; // Import useLocation
 import { FaCaretDown } from "react-icons/fa";
 import ResponsiveMenu from "./ResponsiveMenu";
 import { HiMenuAlt3, HiMenuAlt1 } from "react-icons/hi";
-import { useAuth } from "../../AuthContext";
 
 export const NavbarLinks = [
   {
@@ -27,24 +26,8 @@ export const NavbarLinks = [
 
 const Navbar = ({ handleOrderPopup }) => {
   const [showMenu, setShowMenu] = useState(false);
-  const [role, setRole] = useState(null); // New state for role
   const navigate = useNavigate();
-  const location = useLocation();
-  const { isAuthenticated, username, logout } = useAuth();
-
-  useEffect(() => {
-    // Fetch the user role from the authentication context or API
-    // This is just a placeholder, replace it with actual logic to get the user role
-    const fetchUserRole = async () => {
-      // Example: const userRole = await getUserRole();
-      const userRole = "admin"; // Replace with actual logic
-      setRole(userRole);
-    };
-
-    if (isAuthenticated) {
-      fetchUserRole();
-    }
-  }, [isAuthenticated]);
+  const location = useLocation(); // Get the current location/path
 
   const toggleMenu = () => {
     setShowMenu(!showMenu);
@@ -66,42 +49,38 @@ const Navbar = ({ handleOrderPopup }) => {
             </div>
             <div className="hidden md:block">
               <ul className="flex items-center gap-6">
-                {NavbarLinks.map((link) => (
-                  <li key={link.name} className="py-4">
-                    <Link to={link.link} className={getLinkClass(link.link)}>
-                      {link.name}
-                    </Link>
-                  </li>
-                ))}
+                <li className="py-4">
+                  <Link to="/" className={getLinkClass("/")}>
+                    Home
+                  </Link>
+                </li>
+                <li className="py-4">
+                  <Link to="/blogs" className={getLinkClass("/blogs")}>
+                    Blogs
+                  </Link>
+                </li>
+                <li className="py-4">
+                  <Link
+                    to="/best-places"
+                    className={getLinkClass("/best-places")}
+                  >
+                    Best Places
+                  </Link>
+                </li>
+                <li className="py-4">
+                  <Link to="/about" className={getLinkClass("/about")}>
+                    About
+                  </Link>
+                </li>
               </ul>
             </div>
             <div className="flex items-center gap-4">
-              {isAuthenticated ? (
-                <>
-                  <span className="text-white">{username}</span>
-                  {role === "admin" && (
-                    <button
-                      className="bg-gradient-to-r from-primary to-secondary hover:bg-bg-gradient-to-r hover:from-secondary hover:bg-primary transition-all duration-600 text-blue px-3 py-1 rounded-full"
-                      onClick={() => navigate("/dashboard")}
-                    >
-                      Dashboard
-                    </button>
-                  )}
-                  <button
-                    className="bg-gradient-to-r from-primary to-secondary hover:bg-bg-gradient-to-r hover:from-secondary hover:bg-primary transition-all duration-600 text-blue px-3 py-1 rounded-full"
-                    onClick={logout}
-                  >
-                    Logout
-                  </button>
-                </>
-              ) : (
-                <button
-                  className="bg-gradient-to-r from-primary to-secondary hover:bg-bg-gradient-to-r hover:from-secondary hover:bg-primary transition-all duration-600 text-blue px-3 py-1 rounded-full"
-                  onClick={() => navigate("/login")}
-                >
-                  Login
-                </button>
-              )}
+              <button
+                className="bg-gradient-to-r from-primary to-secondary hover:bg-bg-gradient-to-r hover:from-secondary hover:bg-primary transition-all duration-600 text-blue px-3 py-1 rounded-full"
+                onClick={() => navigate("/login")}
+              >
+                Login
+              </button>
               <div className="md:hidden block">
                 {showMenu ? (
                   <HiMenuAlt1

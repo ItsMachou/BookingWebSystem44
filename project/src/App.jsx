@@ -7,12 +7,12 @@ import NoPage from './pages/NoPage';
 import PlacesRoute from './pages/PlacesRoute';
 import About from './pages/About';
 import BlogsDetails from './pages/BlogsDetails';
-import Login from './components/Login/LoginForm';
+import Login from './components/Login/LoginForm'
+import RegisterForm from './components/Register/RegisterForm';
 import BookingPage from './components/Booking/BookingPage';
 import HomeAdmin from './pages/HomeAdmin'; // Import the HomeAdmin component
 import AOS from 'aos';
 import 'aos/dist/aos.css';
-import { AuthProvider } from './AuthContext';
 
 const App = () => {
   React.useEffect(() => {
@@ -26,7 +26,6 @@ const App = () => {
   }, []);
 
   return (
-    <AuthProvider>
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Layout />}>
@@ -36,13 +35,13 @@ const App = () => {
             <Route path="best-places" element={<PlacesRoute />} />
             <Route path="about" element={<About />} />
             <Route path="login" element={<Login />} />
+            <Route path="register" element={<RegisterForm />} />
             <Route path="*" element={<NoPage />} />
             <Route path="/Booking" element={<BookingPage />} />
             <Route path="dashboard" element={<HomeAdmin />} /> {/* Add the route for HomeAdmin */}
           </Route>
         </Routes>
       </BrowserRouter>
-    </AuthProvider>
   );
 };
 
