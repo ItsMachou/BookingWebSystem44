@@ -1,4 +1,4 @@
-// FILE: register/RegisterForm.jsx
+// FILE: src/components/Register/RegisterForm.jsx
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../../utils/supabaseClient";

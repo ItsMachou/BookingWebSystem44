@@ -2,18 +2,20 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../../utils/supabaseClient";
 import backgroundImage from "../../assets/new york.jpeg";
+import { useAuth } from "../../utils/AuthContext"; // Import the Auth Context
 
 const LoginForm = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const { setUser } = useAuth(); // Use the Auth Context
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setError(null);
 
-    const { user, error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
@@ -21,8 +23,10 @@ const LoginForm = () => {
     if (error) {
       setError(error.message);
     } else {
-      console.log("Logged in successfully:", user);
-      navigate("/");
+      console.log("Logged in successfully:", data.user);
+      setUser(data.user); // Set the user in AuthContext
+      navigate("/"); // Redirect to home page
+      console.log("Navigating to home page");
     }
   };
 

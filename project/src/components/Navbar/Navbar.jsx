@@ -1,9 +1,12 @@
+// FILE: src/components/Navbar/Navbar.jsx
 import React, { useState } from "react";
 import Logo from "../../assets/logo22.png";
-import { Link, useNavigate, useLocation } from "react-router-dom"; // Import useLocation
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { FaCaretDown } from "react-icons/fa";
 import ResponsiveMenu from "./ResponsiveMenu";
 import { HiMenuAlt3, HiMenuAlt1 } from "react-icons/hi";
+import { useAuth } from "../../utils/AuthContext"; // Import the Auth Context
+import DropdownMenu from "./DropdownMenu"; // Import the DropdownMenu component
 
 export const NavbarLinks = [
   {
@@ -27,7 +30,8 @@ export const NavbarLinks = [
 const Navbar = ({ handleOrderPopup }) => {
   const [showMenu, setShowMenu] = useState(false);
   const navigate = useNavigate();
-  const location = useLocation(); // Get the current location/path
+  const location = useLocation();
+  const { user, role, logout } = useAuth(); // Use the Auth Context
 
   const toggleMenu = () => {
     setShowMenu(!showMenu);
@@ -35,6 +39,11 @@ const Navbar = ({ handleOrderPopup }) => {
 
   const getLinkClass = (path) => {
     return location.pathname === path ? "text-green-400" : "text-white";
+  };
+
+  const handleLogout = async () => {
+    await logout();
+    navigate("/login");
   };
 
   return (
@@ -49,38 +58,33 @@ const Navbar = ({ handleOrderPopup }) => {
             </div>
             <div className="hidden md:block">
               <ul className="flex items-center gap-6">
-                <li className="py-4">
-                  <Link to="/" className={getLinkClass("/")}>
-                    Home
-                  </Link>
-                </li>
-                <li className="py-4">
-                  <Link to="/blogs" className={getLinkClass("/blogs")}>
-                    Blogs
-                  </Link>
-                </li>
-                <li className="py-4">
-                  <Link
-                    to="/best-places"
-                    className={getLinkClass("/best-places")}
-                  >
-                    Best Places
-                  </Link>
-                </li>
-                <li className="py-4">
-                  <Link to="/about" className={getLinkClass("/about")}>
-                    About
-                  </Link>
-                </li>
+                {NavbarLinks.map((link) => (
+                  <li key={link.name} className="py-4">
+                    <Link to={link.link} className={getLinkClass(link.link)}>
+                      {link.name}
+                    </Link>
+                  </li>
+                ))}
+                {role === "admin" && (
+                  <li className="py-4">
+                    <Link to="/dashboard" className={getLinkClass("/dashboard")}>
+                      Dashboard
+                    </Link>
+                  </li>
+                )}
               </ul>
             </div>
             <div className="flex items-center gap-4">
-              <button
-                className="bg-gradient-to-r from-primary to-secondary hover:bg-bg-gradient-to-r hover:from-secondary hover:bg-primary transition-all duration-600 text-blue px-3 py-1 rounded-full"
-                onClick={() => navigate("/login")}
-              >
-                Login
-              </button>
+              {user ? (
+                <DropdownMenu handleLogout={handleLogout} />
+              ) : (
+                <button
+                  className="bg-gradient-to-r from-primary to-secondary hover:bg-bg-gradient-to-r hover:from-secondary hover:bg-primary transition-all duration-600 text-blue px-3 py-1 rounded-full"
+                  onClick={() => navigate("/login")}
+                >
+                  Login
+                </button>
+              )}
               <div className="md:hidden block">
                 {showMenu ? (
                   <HiMenuAlt1
