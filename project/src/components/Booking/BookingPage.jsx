@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import axios from 'axios';
+import { supabase } from "../../utils/supabaseClient";
 import { createClient } from '@supabase/supabase-js';
 
 // Initialize Supabase client
@@ -59,29 +60,23 @@ function BookingPage() {
   };
 
   const saveBillingInfo = async (referenceNo) => {
-    const { data, error } = await supabase
-      .from('payments')
-      .insert([
-        {
-          firstname: firstName,
-          lastname: lastName,
-          email: email,
-          contact: contact,
-          id_type: selectedPackage,
-          amount: totalAmount / 100,
-          payment_status: 'pending',
-          payment_reference: referenceNo
-        }
-      ])
-      .select();
+  const sqlInsert = `
+    INSERT INTO payments (firstname, lastname, email, contact, id_type, amount, payment_status, payment_reference)
+    VALUES ('${firstName}', '${lastName}', '${email}', '${contact}', '${selectedPackage}', ${totalAmount / 100}, 'pending', '${referenceNo}')
+    RETURNING *;
+  `;
 
-    if (error) {
-      console.error('Error saving billing info:', error);
-    } else {
-      console.log('Billing info saved:', data);
-    }
+  const { data, error } = await supabase.rpc('execute_sql', {
+    p_sql: sqlInsert
+  });
+
+  if (error) {
+    console.error('Error saving billing info:', error);
+  } else {
+    console.log('Billing info saved:', data);
+  }
   };
-
+  
   const handlePayment = () => {
     const description = `Payment for package ${selectedPackage}`;
     const referenceNo = `REF-${Date.now()}`;
@@ -92,7 +87,7 @@ function BookingPage() {
         // Redirect to the homepage after a short delay
         setTimeout(() => {
           window.location.href = '/';
-        }, 1000); // Adjust the delay as needed
+        }, 10000); // Adjust the delay as needed
       })
       .catch(err => console.error(err));
   };
