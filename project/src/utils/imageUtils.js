@@ -1,8 +1,8 @@
 // utils/imageUtils.js
-import { supabase } from "./supabaseClient";
-import { v4 as uuidv4 } from "uuid";
+import { v4 as uuidv4 } from 'uuid';
+import { supabase } from './supabaseClient'; // Adjust the import according to your project structure
 
-export const uploadImage = async (file) => {
+const uploadImage = async (file) => {
   if (!file) {
     console.error("No file selected");
     return { error: "No file selected" };
@@ -23,3 +23,27 @@ export const uploadImage = async (file) => {
     return { publicURL };
   }
 };
+
+const uploadBlog = async (file) => {
+  if (!file) {
+    console.error("No file selected");
+    return { error: "No file selected" };
+  }
+
+  const uniqueFileName = `${uuidv4()}-${file.name}`;
+  const { data, error } = await supabase
+    .storage
+    .from('blogs_img')
+    .upload(`public_blogs/${uniqueFileName}`, file);
+
+  if (error) {
+    console.error("Error uploading image:", error.message);
+    return { error: error.message };
+  } else {
+    const publicURL = `https://fxnbmnduxydjsfkzsqtl.supabase.co/storage/v1/object/public/blogs_img/public_blogs/${uniqueFileName}`;
+    console.log("Image uploaded successfully:", publicURL);
+    return { publicURL };
+  }
+};
+
+export { uploadImage, uploadBlog };

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import EmployeesAccount from "../components/Administrator/EmployeesAccount";
 import PackageCreator from "../components/Administrator/PackageCreator";
 import CustomersManager from "../components/administrator/CustomersManager";
+import BlogCreator from "../components/Administrator/BlogCreator";
 import "../components/Notification/Notification.css";
 
 const AdminPage = () => {
@@ -39,8 +40,12 @@ const AdminPage = () => {
       );
     } else if (activeSection === "employees") {
       return <EmployeesAccount />;
-    } else if (activeSection === "customers") {
+    }
+      else if (activeSection === "customers") {
       return <CustomersManager />;
+    }
+    else if(activeSection === "blog") {
+      return <BlogCreator/>;
     }
   };
 
@@ -66,6 +71,12 @@ const AdminPage = () => {
             onClick={() => setActiveSection("customers")}
           >
             Customers
+          </li>
+          <li
+            className={`cursor-pointer p-2 ${activeSection === "blog" ? "bg-gray-700" : ""}`}
+            onClick={() => setActiveSection("blog")}
+          >
+            Blog Creator
           </li>
         </ul>
       </div>
