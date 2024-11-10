@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import BlogCard from "./BlogCard";
+import { supabase } from '../../utils/supabaseClient'; // Adjust the import according to your project structure
 import Img1 from "../../assets/places/tajmahal.jpg";
 import Img2 from "../../assets/places/maldives2.jpg";
 import Img3 from "../../assets/places/japan.jpg";
@@ -15,7 +16,7 @@ import Img9 from "../../assets/places/caviteshrine.jpg";
 import Img10 from "../../assets/places/bukidnon2.jpg";
 import Img12 from "../../assets/places/cebu.jpg";
 
-//Placeholder images
+// Placeholder images
 import Img13 from "../../assets/places/tajmahal2.jpg";
 import Img14 from "../../assets/places/maldives.jpg";
 import Img15 from "../../assets/places/mtfuji.jpg";
@@ -28,6 +29,7 @@ import Img21 from "../../assets/places/BalerAurora.jpg";
 import Img22 from "../../assets/places/etivac.jpg";
 import Img23 from "../../assets/places/bukidnoners.jpg";
 import Img24 from "../../assets/places/cebuano.jpg";
+
 const BlogsData = [
   // International Spots
   {
@@ -166,38 +168,71 @@ const BlogsData = [
 ];
 
 const BlogsComp = () => {
+  const [blogsData, setBlogsData] = useState(BlogsData);
+
+  useEffect(() => {
+    fetchBlogsData();
+  }, []);
+
+  const fetchBlogsData = async () => {
+    let { data, error } = await supabase
+      .from('blogs')
+      .select('id, title, author, date, destination, description, image');
+
+    if (error) {
+      console.error("Error fetching blogs data:", error);
+    } else {
+      console.log("Fetched blogs data:", data);
+      setBlogsData([...BlogsData, ...data]);
+    }
+  };
+
   return (
-    <>
-      <div className="dark:bg-gray-900 dark:text-white py-10">
-        <section data-aos="fade-up" className="container">
-          <h1 className="my-8 border-l-8 border-primary/50 py-2 pl-2 text-3xl font-bold">
-            Our Latest Blogs
-          </h1>
+    <div className="dark:bg-gray-900 dark:text-white py-10">
+      <section data-aos="fade-up" className="container">
+        <h1 className="my-8 border-l-8 border-primary/50 py-2 pl-2 text-3xl font-bold">
+          Our Latest Blogs
+        </h1>
 
-          {/* International Section */}
-          <h2 className="my-4 text-2xl font-semibold">
-            International Destinations
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 mb-10">
-            {BlogsData.filter((item) => item.category === "International").map(
-              (item) => (
-                <BlogCard key={item.id} {...item} />
-              )
-            )}
-          </div>
+        {/* International Section */}
+        <h2 className="my-4 text-2xl font-semibold">
+          International Destinations
+        </h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 mb-10">
+          {blogsData.filter((item) => item.category === "International" || item.destination !== "Local").map(
+            (item) => (
+              <BlogCard
+                key={item.id}
+                image={item.image}
+                title={item.title}
+                description={item.description}
+                author={item.author}
+                date={item.date}
+                category="International"
+              />
+            )
+          )}
+        </div>
 
-          {/* Local Section */}
-          <h2 className="my-4 text-2xl font-semibold">Local Destinations</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-            {BlogsData.filter((item) => item.category === "Local").map(
-              (item) => (
-                <BlogCard key={item.id} {...item} />
-              )
-            )}
-          </div>
-        </section>
-      </div>
-    </>
+        {/* Local Section */}
+        <h2 className="my-4 text-2xl font-semibold">Local Destinations</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+          {blogsData.filter((item) => item.category === "Local" || item.destination === "Local").map(
+            (item) => (
+              <BlogCard
+                key={item.id}
+                image={item.image}
+                title={item.title}
+                description={item.description}
+                author={item.author}
+                date={item.date}
+                category="Local"
+              />
+            )
+          )}
+        </div>
+      </section>
+    </div>
   );
 };
 
