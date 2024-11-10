@@ -10,12 +10,11 @@ const EmployeesAccount = () => {
   const [showModal, setShowModal] = useState(false);
   const [notification, setNotification] = useState(null);
 
-  // Function to generate email based on first name and last name
+  
   const generateEmail = (firstName, lastName) => {
     return `${lastName.slice(0, 2).toLowerCase()}${firstName.toLowerCase()}@gmail.com`;
   };
 
-  // Function to generate username based on first name and last name
   const generateUsername = (firstName, lastName) => {
     return `${lastName.slice(0, 2).toLowerCase()}${firstName.toLowerCase()}`;
   };
@@ -117,73 +116,60 @@ const EmployeesAccount = () => {
   };
 
   const handleUpdate = async (e) => {
-    e.preventDefault();
-    setError(null);
+  e.preventDefault();
+  setError(null);
 
-    const { id_acc, firstname, lastname, username } = selectedEmployee;
+  const { id_acc, firstname, lastname, username } = selectedEmployee;
 
-    // Parameterized SQL update statement
-    const sqlUpdate = `
-      UPDATE accounts
-      SET firstname = $1, lastname = $2, username = $3
-      WHERE id_acc = $4;
-    `;
+  // Fetch the user data before performing the update
+  const { data: userData, error: userError } = await supabase
+    .from('accounts')
+    .select('id_acc') // Assuming you want to fetch by user ID
+    .eq('id_acc', id_acc)
+    .single();
 
-    const params = [firstname, lastname, username, id_acc];
+  if (userError) {
+    console.error("Error fetching user:", userError);
+    setError("An error occurred while fetching user data. Please try again.");
+    return;
+  }
 
-    // Call the execute_sql stored procedure to run the parameterized SQL update
-    const { error: updateError } = await supabase.rpc('execute_sql', {
-      p_sql: sqlUpdate,
-      p_params: params
-    });
+  // Raw SQL update statement
+  const sqlUpdate = `
+    UPDATE accounts
+    SET firstname = '${firstname}', lastname = '${lastname}', username = '${username}'
+    WHERE id_acc = '${id_acc}';
+  `;
 
-    if (updateError) {
-      console.error("Error updating employee:", updateError);
-      setError("An error occurred while updating data. Please try again.");
-    } else {
-      console.log("Updated employee successfully");
-      setNotification("Employee has been updated successfully!");
-      setShowModal(true); // Show the modal
-      fetchEmployees(); // Refresh the employee list
-      setIsEditing(false);
-    }
+  // Call the run_raw_sql stored procedure to run the raw SQL update
+  const { data, error: updateError } = await supabase.rpc('run_raw_sql', {
+    sql: sqlUpdate
+  });
+
+  if (updateError) {
+    console.error("Error updating employee:", updateError);
+    setError("An error occurred while updating data. Please try again.");
+  } else {
+    console.log("Updated employee successfully");
+    setNotification("Employee has been updated successfully!");
+    setShowModal(true); // Show the modal
+    fetchEmployees(); // Refresh the employee list
+    setIsEditing(false);
+  }
   };
-
+  
   const handleDeleteAccount = async (id_acc) => {
     console.log("Deleting account with id:", id_acc);
-  
-    // First, fetch the user associated with the account to delete from Auth
-    const { data: userData, error: userError } = await supabase
-      .from('accounts')
-      .select('id_acc') // Assuming you want to delete by user ID
-      .eq('id_acc', id_acc)
-      .single();
-  
-    if (userError) {
-      console.error("Error fetching user data:", userError);
-      setError("Failed to fetch user data. Please try again.");
-      return;
-    }
-  
-    // Delete the user from Supabase Auth using the user ID
-    const { error: authDeleteError } = await supabase.auth.admin.deleteUser(userData.id_acc);
-  
-    if (authDeleteError) {
-      console.error("Error deleting user from Auth:", authDeleteError);
-      setError("Failed to delete user from Auth. Please try again.");
-      return;
-    }
   
     // Parameterized SQL delete statement for the accounts table
     const sqlDelete = `
       DELETE FROM accounts
-      WHERE id_acc = $1::uuid;
+      WHERE id_acc = '${id_acc}';
     `;
   
-    // Call the execute_sql stored procedure to run the parameterized SQL delete
-    const { error: deleteError } = await supabase.rpc('execute_sql', {
-      p_sql: sqlDelete,
-      p_params: [id_acc] // Pass the UUID as a parameter
+    // Call the run_raw_sql stored procedure to run the parameterized SQL delete
+    let { data, error: deleteError } = await supabase.rpc('run_raw_sql', {
+      sql: sqlDelete
     });
   
     if (deleteError) {
