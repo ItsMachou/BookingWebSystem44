@@ -1,18 +1,18 @@
 import React, { useState } from "react";
-import { useAuth } from "../../utils/AuthContext"; // Import the Auth Context
-import { useNavigate } from "react-router-dom"; // Import useNavigate
+import { useAuth } from "../../utils/AuthContext"; 
+import { useNavigate } from "react-router-dom"; 
 
 const DropdownMenu = ({ handleLogout }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const { username } = useAuth(); // Use the Auth Context
-  const navigate = useNavigate(); // Initialize useNavigate
+  const { username } = useAuth(); 
+  const navigate = useNavigate(); 
 
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
   };
 
   const handleEditProfile = () => {
-    navigate("/AccountSetting"); // Navigate to the AccountSettings route
+    navigate("/AccountSetting"); 
   };
 
   return (

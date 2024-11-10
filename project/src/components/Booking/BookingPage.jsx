@@ -4,7 +4,6 @@ import axios from 'axios';
 import { supabase } from "../../utils/supabaseClient";
 import { createClient } from '@supabase/supabase-js';
 
-// Initialize Supabase client
 const supabaseUrl = 'https://fxnbmnduxydjsfkzsqtl.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ4bmJtbmR1eHlkanNma3pzcXRsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzExMjgzMTksImV4cCI6MjA0NjcwNDMxOX0.uPFnntpdKnJXo-nO6KSFtm94A7TTC8HRmkivjvZCqg8'
 
@@ -41,7 +40,7 @@ function BookingPage() {
   const handlePackageChange = (e) => {
     const packageId = e.target.value;
     setSelectedPackage(packageId);
-    setTotalAmount(packagePrices[packageId].price * 100); // Multiply by 100
+    setTotalAmount(packagePrices[packageId].price * 100);
   };
 
   const createPayLink = (amount, description) => {
@@ -97,13 +96,12 @@ function BookingPage() {
     const description = `Payment for package ${packagePrices[selectedPackage].name}`;
     const referenceNo = `REF-${Date.now()}`;
     saveBillingInfo(referenceNo);
-    createPayLink(totalAmount, description) // Use totalAmount directly
+    createPayLink(totalAmount, description)
       .then(checkoutUrl => {
         window.open(checkoutUrl, '_blank');
-        // Redirect to the homepage after a short delay
         setTimeout(() => {
           window.location.href = '/';
-        }, 30000); // Adjust the delay as needed
+        }, 30000);
       })
       .catch(err => console.error(err));
   };
@@ -111,7 +109,6 @@ function BookingPage() {
   return (
     <div className="min-h-screen bg-gray-200 flex justify-center items-center p-4">
       <div className="w-full max-w-4xl bg-white rounded-lg shadow-md p-6 flex flex-col space-y-4">
-        {/* Back Button and Title */}
         <div className="flex justify-between items-center">
           <Link to="/" className="text-gray-600 text-sm">
             &larr; Back
@@ -121,9 +118,7 @@ function BookingPage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* Left Section: Packages and Form Fields */}
           <div className="md:col-span-2 space-y-6">
-            {/* Packages Section */}
             <div>
               <h2 className="text-xl font-bold">Packages</h2>
               <div className="mt-2 border rounded-lg p-4 flex items-center space-x-4 bg-gray-50">
@@ -158,7 +153,6 @@ function BookingPage() {
               </div>
             </div>
 
-            {/* Form Fields */}
             <div className="space-y-4">
               <div>
                 <label className="block font-semibold">Date</label>
@@ -207,7 +201,6 @@ function BookingPage() {
               </div>
             </div>
 
-            {/* Payment Option Section */}
             <div className="mt-4">
               <h2 className="text-xl font-bold">Payment Option</h2>
               <button
@@ -233,7 +226,6 @@ function BookingPage() {
             </div>
           </div>
 
-          {/* Right Section: Total */}
           <div className="bg-gray-50 rounded-lg p-6 border space-y-2">
             <h2 className="text-xl font-bold">TOTAL</h2>
             <div className="space-y-2">

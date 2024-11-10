@@ -18,7 +18,7 @@ const Home = () => {
     setOrderPopup(!orderPopup);
   };
 
-  // Inline styles for the main background and cloud/airplane positions
+
   const mainStyle = {
     backgroundColor: "#0058b4",
     backgroundImage: `url(${BackgroundImage})`,
@@ -58,7 +58,7 @@ const Home = () => {
     animation: "fly 10s linear infinite",
   };
 
-  // Define a smooth horizontal animation for the airplane without zooming
+  
   React.useEffect(() => {
     const flyAnimation = `
       @keyframes fly {

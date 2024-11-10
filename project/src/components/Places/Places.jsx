@@ -16,7 +16,7 @@ const Places = ({ handleOrderPopup }) => {
       if (error) {
         console.error("Error fetching places data:", error);
       } else {
-        console.log("Fetched data:", data); // Log fetched data
+        console.log("Fetched data:", data); 
         setPlacesData(data);
       }
       console.log("Executing SQL query:", sqlQuery);

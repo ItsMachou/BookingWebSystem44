@@ -26,7 +26,7 @@ const BlogsDetails = () => {
         {/* Image placeholder below the description */}
         <div className="mt-4">
           <img
-            src={placeholderImage} // Use the placeholderImage from state
+            src={placeholderImage} 
             alt="Placeholder"
             className="w-full h-auto mt-4 rounded-lg shadow-lg"
           />

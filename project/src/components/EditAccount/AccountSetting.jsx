@@ -2,20 +2,18 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
 import { createClient } from '@supabase/supabase-js';
 
-// Initialize Supabase client using environment variables
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 const AccountSettings = () => {
-  const navigate = useNavigate(); // Initialize useNavigate
+  const navigate = useNavigate();
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [contactNo, setContactNo] = useState('');
 
   useEffect(() => {
-    // Fetch user data from Supabase using raw SQL
     const fetchUserData = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
@@ -42,11 +40,10 @@ const AccountSettings = () => {
   }, []);
 
   const handleBack = () => {
-    navigate('/'); // Navigate to the home page
+    navigate('/');
   };
 
   const handleCancel = () => {
-    // Reset the form fields
     setUsername('');
     setEmail('');
     setContactNo('');
@@ -56,7 +53,6 @@ const AccountSettings = () => {
     e.preventDefault();
     const { data: { user } } = await supabase.auth.getUser();
     if (user) {
-      // Construct the SQL update statement
       const sqlUpdate = `
         UPDATE accounts
         SET username = '${username}',
@@ -65,7 +61,6 @@ const AccountSettings = () => {
         WHERE id_acc = '${user.id}';
       `;
 
-      // Call the execute_sql stored procedure to run the SQL update
       const { error: updateError } = await supabase.rpc('execute_sql', {
         p_sql: sqlUpdate
       });
@@ -81,13 +76,11 @@ const AccountSettings = () => {
   const handleDelete = async () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (user) {
-      // Construct the SQL delete statement
       const sqlDelete = `
         DELETE FROM accounts
         WHERE id_acc = '${user.id}';
       `;
 
-      // Call the execute_sql stored procedure to run the SQL delete
       const { error: deleteError } = await supabase.rpc('execute_sql', {
         p_sql: sqlDelete
       });
@@ -96,30 +89,20 @@ const AccountSettings = () => {
         console.error('Error deleting user data:', deleteError);
       } else {
         console.log('User data deleted successfully');
-        // Log out the user
         await supabase.auth.signOut();
-        // Navigate to the login page or home page
-        navigate('/login'); // Adjust the path as needed
+        navigate('/login');
       }
     }
   };
 
   return (
     <div className="flex flex-col items-center min-h-screen bg-gray-200">
-      {/* Set a wider container */}
       <div className="w-full max-w-4xl p-8 bg-white rounded-lg shadow-md mt-16">
-        {/* Back button */}
         <div className="flex items-center mb-4">
           <button onClick={handleBack} className="text-gray-600 text-sm">&larr; Back</button>
         </div>
-
-        {/* Title */}
         <h2 className="text-center text-3xl font-semibold mb-6">MASADYA</h2>
-
-        {/* Section title */}
         <h3 className="text-lg font-bold mb-6">Personal Details</h3>
-
-        {/* Form with adjusted spacing */}
         <form className="space-y-6" onSubmit={handleUpdate}>
           <div>
             <label className="block text-gray-700">Username</label>
@@ -131,7 +114,6 @@ const AccountSettings = () => {
               onChange={(e) => setUsername(e.target.value)}
             />
           </div>
-
           <div>
             <label className="block text-gray-700">Email</label>
             <input
@@ -142,7 +124,6 @@ const AccountSettings = () => {
               onChange={(e) => setEmail(e.target.value)}
             />
           </div>
-
           <div>
             <label className="block text-gray-700">Contact No.</label>
             <input
@@ -153,7 +134,6 @@ const AccountSettings = () => {
               onChange={(e) => setContactNo(e.target.value)}
             />
           </div>
-
           <div className="flex justify-between items-center">
             <button
               type="button"

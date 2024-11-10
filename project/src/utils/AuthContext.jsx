@@ -34,7 +34,7 @@ export const AuthProvider = ({ children }) => {
           .from('accounts')
           .select('username, role')
           .eq('id_acc', user.id)
-          .single(); // Fetch a single record
+          .single();
 
         if (error) {
           console.error('Error fetching user data:', error);
@@ -51,8 +51,8 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     await supabase.auth.signOut();
     setUser(null);
-    setUsername(''); // Clear the username on logout
-    setRole(''); // Clear the role on logout
+    setUsername(''); 
+    setRole(''); 
   };
 
   return (

@@ -1,17 +1,14 @@
 import React, { useState } from "react";
 import { IoCloseOutline } from "react-icons/io5";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
+import { useNavigate } from "react-router-dom"; 
 
 
 const OrderPopup = ({ orderPopup, setOrderPopup }) => {
   const [isFormVisible, setIsFormVisible] = useState(false);
-  const navigate = useNavigate(); // Initialize useNavigate
+  const navigate = useNavigate();
 
   const handleTransactionSubmit = (transactionData) => {
     console.log("Transaction Data:", transactionData);
-    // You can handle the submission, e.g., sending it to an API
-
-    // Close the popup after submission
   };
 
   return (
@@ -39,7 +36,7 @@ const OrderPopup = ({ orderPopup, setOrderPopup }) => {
                 </p>
                 <div className="flex justify-center">
                   <button
-                    onClick={() => navigate("/booking")} // Navigate to BookingPage
+                    onClick={() => navigate("/booking")} 
                     className="bg-gradient-to-r from-primary to-secondary hover:scale-105 duration-200 text-white py-1 px-4 rounded-full"
                   >
                     Book Now
