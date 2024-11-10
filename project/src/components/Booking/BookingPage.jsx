@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import axios from 'axios';
 import { supabase } from "../../utils/supabaseClient";
@@ -15,17 +15,33 @@ function BookingPage() {
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [contact, setContact] = useState("");
+  const [packagePrices, setPackagePrices] = useState({});
 
-  const packagePrices = {
-    1: 500000, // Budget Package
-    2: 1000000, // Standard Package
-    3: 2000000, // Deluxe Package
+  useEffect(() => {
+    fetchPackagePrices();
+  }, []);
+
+  const fetchPackagePrices = async () => {
+    let { data, error } = await supabase
+      .from('package')
+      .select('pkg_id, pkg_name, pkg_price');
+
+    if (error) {
+      console.error("Error fetching package prices:", error);
+    } else {
+      console.log("Fetched package prices:", data);
+      const prices = {};
+      data.forEach(pkg => {
+        prices[pkg.pkg_id] = { name: pkg.pkg_name, price: pkg.pkg_price };
+      });
+      setPackagePrices(prices);
+    }
   };
 
   const handlePackageChange = (e) => {
     const packageId = e.target.value;
     setSelectedPackage(packageId);
-    setTotalAmount(packagePrices[packageId]);
+    setTotalAmount(packagePrices[packageId].price * 100); // Multiply by 100
   };
 
   const createPayLink = (amount, description) => {
@@ -60,34 +76,34 @@ function BookingPage() {
   };
 
   const saveBillingInfo = async (referenceNo) => {
-  const sqlInsert = `
-    INSERT INTO payments (firstname, lastname, email, contact, id_type, amount, payment_status, payment_reference)
-    VALUES ('${firstName}', '${lastName}', '${email}', '${contact}', '${selectedPackage}', ${totalAmount / 100}, 'pending', '${referenceNo}')
-    RETURNING *;
-  `;
+    const sqlInsert = `
+      INSERT INTO payments (firstname, lastname, email, contact, amount, payment_status, payment_reference)
+      VALUES ('${firstName}', '${lastName}', '${email}', '${contact}', ${totalAmount / 100}, 'pending', '${referenceNo}')
+      RETURNING *;
+    `;
 
-  const { data, error } = await supabase.rpc('execute_sql', {
-    p_sql: sqlInsert
-  });
+    const { data, error } = await supabase.rpc('execute_sql', {
+      p_sql: sqlInsert
+    });
 
-  if (error) {
-    console.error('Error saving billing info:', error);
-  } else {
-    console.log('Billing info saved:', data);
-  }
+    if (error) {
+      console.error('Error saving billing info:', error);
+    } else {
+      console.log('Billing info saved:', data);
+    }
   };
-  
+
   const handlePayment = () => {
-    const description = `Payment for package ${selectedPackage}`;
+    const description = `Payment for package ${packagePrices[selectedPackage].name}`;
     const referenceNo = `REF-${Date.now()}`;
     saveBillingInfo(referenceNo);
-    createPayLink(totalAmount, description)
+    createPayLink(totalAmount, description) // Use totalAmount directly
       .then(checkoutUrl => {
         window.open(checkoutUrl, '_blank');
         // Redirect to the homepage after a short delay
         setTimeout(() => {
           window.location.href = '/';
-        }, 10000); // Adjust the delay as needed
+        }, 30000); // Adjust the delay as needed
       })
       .catch(err => console.error(err));
   };
@@ -133,9 +149,11 @@ function BookingPage() {
                   <option value="" disabled>
                     Pick your package
                   </option>
-                  <option value="1">Budget Package</option>
-                  <option value="2">Standard Package</option>
-                  <option value="3">Deluxe Package</option>
+                  {Object.keys(packagePrices).map((pkgId) => (
+                    <option key={pkgId} value={pkgId}>
+                      {packagePrices[pkgId].name}
+                    </option>
+                  ))}
                 </select>
               </div>
             </div>
