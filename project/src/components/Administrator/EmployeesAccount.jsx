@@ -4,13 +4,12 @@ import { supabase } from "../../utils/supabaseClient";
 const EmployeesAccount = () => {
   const [employees, setEmployees] = useState([]);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
-  const [selectedEmployeeId, setSelectedEmployeeId] = useState(""); // State to store the UUID
+  const [selectedEmployeeId, setSelectedEmployeeId] = useState("");
   const [isEditing, setIsEditing] = useState(false);
   const [error, setError] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [notification, setNotification] = useState(null);
 
-  
   const generateEmail = (firstName, lastName) => {
     return `${lastName.slice(0, 2).toLowerCase()}${firstName.toLowerCase()}@gmail.com`;
   };
@@ -19,21 +18,22 @@ const EmployeesAccount = () => {
     return `${lastName.slice(0, 2).toLowerCase()}${firstName.toLowerCase()}`;
   };
 
-  // Fetch employees from the accounts table using Supabase query builder
   const fetchEmployees = async () => {
-    const { data, error } = await supabase
-      .from('accounts')
-      .select('id_acc, firstname, lastname, email, username')
-      .eq('role', 'employee');
+    const sqlQuery = 'SELECT * FROM accounts WHERE role = "employee";';
 
-    console.log('Executing SQL query: SELECT id_acc, firstname, lastname, email, username FROM public.accounts WHERE role = employee;');
+    const { data, error } = await supabase
+      .from("accounts")
+      .select("*")
+      .eq("role", "employee");
+  
     if (error) {
-      console.error('Error fetching employees:', error);
+      console.error("Error fetching employees data:", error);
       setError("Failed to fetch employees. Please try again.");
     } else {
-      console.log('Fetched employees:', data);
+      console.log("Fetched employees:", data);
       setEmployees(data);
     }
+    console.log("Executing SQL query:", sqlQuery);
   };
 
   useEffect(() => {
@@ -43,7 +43,7 @@ const EmployeesAccount = () => {
   const handleSelectEmployee = (employee) => {
     console.log("Selected employee:", employee);
     setSelectedEmployee(employee);
-    setSelectedEmployeeId(employee.id_acc); // Set the UUID state variable
+    setSelectedEmployeeId(employee.id_acc);
     setIsEditing(true);
   };
 
@@ -56,12 +56,11 @@ const EmployeesAccount = () => {
     const email = generateEmail(firstName, lastName);
     const username = generateUsername(firstName, lastName);
     const role = 'employee';
-    const contactNo = null; // Contact number can be null
+    const contactNo = null;
 
-    // Handle sign-up logic
     const { data, error } = await supabase.auth.signUp({
       email,
-      password: 'defaultpassword', // Use a default password or generate one
+      password: 'defaultpassword',
       options: {
         data: {
           username,
@@ -74,22 +73,20 @@ const EmployeesAccount = () => {
 
     if (error) {
       setError(error.message);
-      return; // Exit the function if there is an error
+      return;
     }
 
-    // Check if user is defined
     if (!data.user) {
       setError("User registration failed.");
-      return; // Exit the function if user is undefined
+      return;
     }
 
     console.log("Signed up successfully:", data.user);
 
-    // Hard-coded SQL insert statement with user ID
     const sqlInsert = `
       INSERT INTO accounts (id_acc, lastname, firstname, username, email, contact_no, role)
       VALUES (
-        '${data.user.id}',  -- Use the authenticated user's ID
+        '${data.user.id}',
         '${lastName}', 
         '${firstName}', 
         '${username}', 
@@ -99,7 +96,6 @@ const EmployeesAccount = () => {
       );
     `;
 
-    // Call the execute_sql stored procedure to run the hard-coded SQL insert
     const { error: insertError } = await supabase.rpc('execute_sql', {
       p_sql: sqlInsert
     });
@@ -110,77 +106,81 @@ const EmployeesAccount = () => {
     } else {
       console.log("Inserted into accounts table successfully");
       setNotification("Account has been added successfully!");
-      setShowModal(true); // Show the modal
-      fetchEmployees(); // Refresh the employee list
+      setShowModal(true);
+      fetchEmployees();
+      clearSelection();
     }
   };
 
   const handleUpdate = async (e) => {
-  e.preventDefault();
-  setError(null);
+    e.preventDefault();
+    setError(null);
 
-  const { id_acc, firstname, lastname, username } = selectedEmployee;
+    const { id_acc, firstname, lastname, username } = selectedEmployee;
 
-  // Fetch the user data before performing the update
-  const { data: userData, error: userError } = await supabase
-    .from('accounts')
-    .select('id_acc') // Assuming you want to fetch by user ID
-    .eq('id_acc', id_acc)
-    .single();
+    const { data: userData, error: userError } = await supabase
+      .from('accounts')
+      .select('id_acc')
+      .eq('id_acc', id_acc)
+      .single();
 
-  if (userError) {
-    console.error("Error fetching user:", userError);
-    setError("An error occurred while fetching user data. Please try again.");
-    return;
-  }
+    if (userError) {
+      console.error("Error fetching user:", userError);
+      setError("An error occurred while fetching user data. Please try again.");
+      return;
+    }
 
-  // Raw SQL update statement
-  const sqlUpdate = `
-    UPDATE accounts
-    SET firstname = '${firstname}', lastname = '${lastname}', username = '${username}'
-    WHERE id_acc = '${id_acc}';
-  `;
+    const sqlUpdate = `
+      UPDATE accounts
+      SET firstname = '${firstname}', lastname = '${lastname}', username = '${username}'
+      WHERE id_acc = '${id_acc}';
+    `;
 
-  // Call the run_raw_sql stored procedure to run the raw SQL update
-  const { data, error: updateError } = await supabase.rpc('run_raw_sql', {
-    sql: sqlUpdate
-  });
+    const { data, error: updateError } = await supabase.rpc('run_raw_sql', {
+      sql: sqlUpdate
+    });
 
-  if (updateError) {
-    console.error("Error updating employee:", updateError);
-    setError("An error occurred while updating data. Please try again.");
-  } else {
-    console.log("Updated employee successfully");
-    setNotification("Employee has been updated successfully!");
-    setShowModal(true); // Show the modal
-    fetchEmployees(); // Refresh the employee list
-    setIsEditing(false);
-  }
+    if (updateError) {
+      console.error("Error updating employee:", updateError);
+      setError("An error occurred while updating data. Please try again.");
+    } else {
+      console.log("Updated employee successfully");
+      setNotification("Employee has been updated successfully!");
+      setShowModal(true);
+      fetchEmployees();
+      setIsEditing(false);
+      clearSelection();
+    }
   };
-  
+
   const handleDeleteAccount = async (id_acc) => {
     console.log("Deleting account with id:", id_acc);
-  
-    // Parameterized SQL delete statement for the accounts table
+
     const sqlDelete = `
       DELETE FROM accounts
       WHERE id_acc = '${id_acc}';
     `;
-  
-    // Call the run_raw_sql stored procedure to run the parameterized SQL delete
+
     let { data, error: deleteError } = await supabase.rpc('run_raw_sql', {
       sql: sqlDelete
     });
-  
+
     if (deleteError) {
       console.error("Error deleting account from database:", deleteError);
       setError("An error occurred while deleting the account from the database. Please try again.");
     } else {
       console.log("Deleted account successfully from database");
       setNotification("Account has been deleted successfully!");
-      setShowModal(true); // Show the modal
-      fetchEmployees(); // Refresh the account list
+      setShowModal(true);
+      fetchEmployees();
+      clearSelection();
     }
+  };
+
+  const clearSelection = () => {
+    setSelectedEmployee(null);
+    setSelectedEmployeeId("");
+    setIsEditing(false);
   };
 
   return (
@@ -266,36 +266,42 @@ const EmployeesAccount = () => {
                   Register Employee
                 </button>
               )}
+              <button
+                className="bg-gray-500 hover:bg-gray-600 text-white font-semibold px-6 py-2 rounded-lg transition duration-200 ease-in-out"
+                onClick={clearSelection}
+              >
+                Clear Selection
+              </button>
             </div>
           </div>
         </div>
-      </div>
-      <div className="w-full md:w-1/2 bg-gray-50 rounded-lg shadow-md border border-gray-300 overflow-hidden mt-8">
-        <table className="w-full border-collapse">
-          <thead>
-            <tr className="bg-blue-600 text-white">
-              {["First Name", "Last Name", "Email", "Username"].map((header, idx) => (
-                <th key={idx} className="p-4 text-left font-semibold text-sm">
-                  {header}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {employees && employees.map((employee) => (
-              <tr
-                key={employee.id_acc}
-                className="bg-white border-b border-gray-200 hover:bg-gray-100 cursor-pointer"
-                onClick={() => handleSelectEmployee(employee)}
-              >
-                <td className="p-4 text-gray-700">{employee.firstname}</td>
-                <td className="p-4 text-gray-700">{employee.lastname}</td>
-                <td className="p-4 text-gray-700">{employee.email}</td>
-                <td className="p-4 text-gray-700">{employee.username}</td>
+        <div className="w-full md:w-1/2 bg-gray-50 rounded-lg shadow-md border border-gray-300 overflow-hidden">
+          <table className="w-full border-collapse">
+            <thead>
+              <tr className="bg-blue-600 text-white">
+                {["First Name", "Last Name", "Email", "Username"].map((header, idx) => (
+                  <th key={idx} className="p-4 text-left font-semibold text-sm">
+                    {header}
+                  </th>
+                ))}
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {employees && employees.map((employee) => (
+                <tr
+                  key={employee.id_acc}
+                  className="bg-white border-b border-gray-200 hover:bg-gray-100 cursor-pointer"
+                  onClick={() => handleSelectEmployee(employee)}
+                >
+                  <td className="p-4 text-gray-700">{employee.firstname}</td>
+                  <td className="p-4 text-gray-700">{employee.lastname}</td>
+                  <td className="p-4 text-gray-700">{employee.email}</td>
+                  <td className="p-4 text-gray-700">{employee.username}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
