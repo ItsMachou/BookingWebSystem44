@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../../utils/supabaseClient";
 import backgroundImage from "../../assets/new york.jpeg";
-import Modal from "./Modal"; // Import the Modal component
+import Modal from "./Modal"; 
 
 const RegisterForm = () => {
   const [username, setUsername] = useState("");
@@ -10,11 +10,11 @@ const RegisterForm = () => {
   const [lastname, setLastname] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [contactNo, setContactNo] = useState(""); // Add contact number state
-  const [role] = useState("user"); // Set role to "user" by default
+  const [contactNo, setContactNo] = useState(""); 
+  const [role] = useState("user"); 
   const [error, setError] = useState(null);
   const [notification, setNotification] = useState(null);
-  const [showModal, setShowModal] = useState(false); // State to control modal visibility
+  const [showModal, setShowModal] = useState(false); 
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -31,7 +31,7 @@ const RegisterForm = () => {
     e.preventDefault();
     setError(null);
 
-    // Handle sign-up logic
+    
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -47,18 +47,18 @@ const RegisterForm = () => {
 
     if (error) {
       setError(error.message);
-      return; // Exit the function if there is an error
+      return; 
     }
 
-    // Check if user is defined
+   
     if (!data.user) {
       setError("User registration failed.");
-      return; // Exit the function if user is undefined
+      return; 
     }
 
     console.log("Signed up successfully:", data.user);
 
-    // Hard-coded SQL insert statement with user ID
+    
     const sqlInsert = `
       INSERT INTO accounts (id_acc, lastname, firstname, username, email, contact_no, role)
       VALUES (
@@ -72,7 +72,7 @@ const RegisterForm = () => {
       );
     `;
 
-    // Call the execute_sql stored procedure to run the hard-coded SQL insert
+    
     const { error: insertError } = await supabase.rpc('execute_sql', {
       p_sql: sqlInsert
     });
@@ -82,7 +82,7 @@ const RegisterForm = () => {
       setError(insertError.message || "An error occurred while inserting data.");
     } else {
       console.log("Inserted into accounts table successfully");
-      setShowModal(true); // Show the modal
+      setShowModal(true); 
     }
   };
 

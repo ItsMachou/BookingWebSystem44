@@ -41,7 +41,7 @@ const BlogsData = [
     author: "Travel Writer",
     date: "April 22, 2024",
     category: "International",
-    placeholderImage: Img13, // Add your placeholder image path here
+    placeholderImage: Img13, 
   },
   {
     id: 2,

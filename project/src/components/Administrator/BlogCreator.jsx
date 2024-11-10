@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './BlogCreator.css';
-import { supabase } from '../../utils/supabaseClient'; // Adjust the import according to your project structure
-import { uploadBlog } from '../../utils/imageUtils'; // Adjust the import according to your project structure
+import { supabase } from '../../utils/supabaseClient';
+import { uploadBlog } from '../../utils/imageUtils';
 
 function BlogCreator() {
     const [blogs, setBlogs] = useState([]);
@@ -44,7 +44,6 @@ function BlogCreator() {
             imageUrl = uploadResult.publicURL;
         }
 
-        // Raw SQL insert statement
         const sqlInsert = `
             INSERT INTO blogs (title, author, date, destination, description, image)
             VALUES ('${title}', '${author}', '${date}', '${destination}', '${description}', '${imageUrl}')
@@ -63,7 +62,7 @@ function BlogCreator() {
         console.log("Created blog:", data);
 
         const newBlog = {
-            id: data[0].id, // Assuming the RPC returns the inserted row with an id
+            id: data[0].id,
             title,
             author,
             date,
@@ -84,7 +83,6 @@ function BlogCreator() {
             return;
         }
 
-        // Raw SQL update statement
         const sqlUpdate = `
             UPDATE blogs
             SET title = '${title}', author = '${author}', date = '${date}', destination = '${destination}', description = '${description}'
@@ -101,7 +99,7 @@ function BlogCreator() {
         } else {
             console.log("Updated blog successfully");
             setNotification("Blog has been updated successfully!");
-            fetchBlogs(); // Refresh the blog list
+            fetchBlogs();
             clearForm();
         }
     };
@@ -150,7 +148,6 @@ function BlogCreator() {
 
     return (
         <div style={{ display: 'flex', gap: '20px', padding: '20px' }}>
-            {/* Blog Creator Form */}
             <div style={{ flex: 1 }}>
                 <h2>Blog Creator</h2>
                 <div>
@@ -194,7 +191,6 @@ function BlogCreator() {
                 )}
             </div>
 
-            {/* Blog List Table */}
             <div style={{ flex: 1 }}>
                 <h2>Blog List</h2>
                 <table>

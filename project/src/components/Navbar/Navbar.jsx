@@ -4,8 +4,8 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { FaCaretDown } from "react-icons/fa";
 import ResponsiveMenu from "./ResponsiveMenu";
 import { HiMenuAlt3, HiMenuAlt1 } from "react-icons/hi";
-import { useAuth } from "../../utils/AuthContext"; // Import the Auth Context
-import DropdownMenu from "./DropdownMenu"; // Import the DropdownMenu component
+import { useAuth } from "../../utils/AuthContext"; 
+import DropdownMenu from "./DropdownMenu"; 
 
 export const NavbarLinks = [
   {
@@ -30,7 +30,7 @@ const Navbar = ({ handleOrderPopup }) => {
   const [showMenu, setShowMenu] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-  const { user, role, logout } = useAuth(); // Use the Auth Context
+  const { user, role, logout } = useAuth(); 
 
   const toggleMenu = () => {
     setShowMenu(!showMenu);
