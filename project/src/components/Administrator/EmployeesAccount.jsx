@@ -122,6 +122,19 @@ const EmployeesAccount = () => {
 
     const { id_acc, firstname, lastname, username } = selectedEmployee;
 
+    // Fetch the user data before performing the update
+    const { data: userData, error: userError } = await supabase
+      .from('accounts')
+      .select('id_acc') // Assuming you want to fetch by user ID
+      .eq('id_acc', id_acc)
+      .single();
+
+    if (userError) {
+      console.error("Error fetching user:", userError);
+      setError("An error occurred while fetching user data. Please try again.");
+      return;
+    }
+
     // Parameterized SQL update statement
     const sqlUpdate = `
       UPDATE accounts
